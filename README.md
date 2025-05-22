@@ -8,7 +8,7 @@ A powerful and flexible Aseprite script to export your layers and groups intelli
 ## ✨ Features
 
 - **Recursive export** of layers and groups
-- ⚠️**Path from layer name**: export path is now defined by a special layer [see below](#define-the-export-folder-via-a-layer)⚠️
+- ⚠️**Path from layer name**: export path is now defined by a special layer [see below](https://github.com/FeelPr/export-by-group-recursive/tree/main?tab=readme-ov-file#-define-the-export-folder-via-a-layer)⚠️
 - **Trimmed PNGs**: crops empty pixels from exports
 - **Group fusion**: export a whole group as one image using `@GroupName`
 - **Visibility aware**: respects the "eye" icon in Aseprite
