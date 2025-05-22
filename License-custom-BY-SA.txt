@@ -1,0 +1,30 @@
+Custom License: 
+	Attribution - No Direct Resale - ShareAlike
+
+Author: Feel (https://www.instagram.com/feel.pixels/)
+Co-developed with: ChatGPT (OpenAI)
+
+You are free to:
+✅ Use 		— You may use this script in personal, professional.
+✅ Modify 	— You may adapt, extend, or integrate this script into your own tools.
+✅ Share 	— You may distribute modified versions, under the same conditions.
+
+Under the following terms:
+📌 Attribution 
+	— You must give appropriate credit to the original author. Please include: 
+	Author: Feel (https://www.instagram.com/feel.pixels/)
+
+❌ No Direct Resale 
+	— You may not sell, sublicense, or redistribute this script as a standalone product (original or modified), whether for money or any form of compensation.
+
+📌 ShareAlike 
+	— If you publish a modified version, it must be shared under the same license and terms as this original script.
+
+📬 It is appreciated (but not required) to inform or tag the author when using this in public/commercial projects.
+
+---
+
+This custom license is based on principles from Creative Commons BY-SA,
+with additional restrictions on direct resale.
+
+Copyright © 2024–2025 Feel
