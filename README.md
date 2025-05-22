@@ -1,3 +1,4 @@
+
 # Export By Group (Recursive)
 
 A powerful and flexible Aseprite script to export your layers and groups intelligently. Designed by **Feel** ([https://www.instagram.com/feel.pixels/](https://www.instagram.com/feel.pixels/)) & ChatGPT, this script enables professional export workflows for artists working with layered sprites, dioramas, or modular elements.
@@ -7,12 +8,13 @@ A powerful and flexible Aseprite script to export your layers and groups intelli
 ## ✨ Features
 
 - **Recursive export** of layers and groups
+- ⚠️**Path from layer name**: export path is now defined by a special layer [see below](#define-the-export-folder-via-a-layer)⚠️
 - **Trimmed PNGs**: crops empty pixels from exports
 - **Group fusion**: export a whole group as one image using `@GroupName`
 - **Visibility aware**: respects the "eye" icon in Aseprite
 - **Ignore filter**: use `#` in a group/layer name to skip it
-- **Command-line silent**: minimizes terminal flickers during export (Windows)
 - **Export logs**: saved in `/Export-Logs/export-log.txt` for every session
+- **No more script editing required** to change export folder
 
 ---
 
@@ -48,23 +50,41 @@ Any visible layer not inside a `@group` or containing `#` will be exported trimm
 Layer: Sword_Blade → Sword_Blade.png
 ```
 
-### 🔹 Folder structure
+### 🔹 Define the export folder via a layer
 
-- Export root is defined in the script:
+Instead of editing the script, you now define the export root path directly inside your `.aseprite` file.
 
-```lua
-local exportRoot = "E:/.../"
-```
-
-- Each group name becomes a folder:
+Just add a layer named with `%` followed by your desired export path:
 
 ```
-Items/
-├── Shield.png
-├── Sword_Blade.png
+%E:/MyGame/Exports/Characters/
 ```
 
-- Logs are saved in: `<ExportFolder>/Export-Logs/export-log.txt`
+🛑 **Important rules:**
+- You must have **exactly one** `%layer`.
+- The path must end with a slash `/` (or double-backslash `\` for Windows).
+- If the path contains single backslashes (`\`), you **must double them** to avoid Lua errors.
+
+✅ Correct:
+```
+%E:/MyGame/Exports/
+%E:\\MyGame\\Exports\\
+```
+
+❌ Incorrect:
+```
+%E:\MyGame\Exports
+```
+
+![Example %Layer](exemple_percent_layer.png)
+
+---
+Some 'security' check, no more dumb error.
+
+![export_complete](export_complete.png)
+![invalid_path](invalid_path.png)
+![multiple_percent](multiple_percent.png)
+![slash_uses](slash_uses.png)
 
 ---
 
@@ -74,26 +94,11 @@ Items/
 👉 <a href="https://github.com/FeelPr/export-by-group-recursive" target="_blank">GitHub – Export By Group (Recursive)</a>
 
 2. Place the `export-by-group-recursive.lua` file in your Aseprite scripts folder:
+```
 C:\Users\YourName\AppData\Roaming\Aseprite\scripts\
-
-3. **Edit** the `exportRoot` (**line 14**) variable at the top of the script to set your preferred export folder path.
-> #### ⚠️ Important note about the export path
-> When editing the `exportRoot` variable, 
-> make sure to use **forward slashes `/`** or  **double backslashes `\\`** otherwise Lua will throw an error.
-
-✅ Correct example:
-```
-local exportRoot = "E:/My/Export/Folder/"
--- or
-local exportRoot = "E:\\My\\Export\\Folder\\"
 ```
 
-❌ Incorrect (this will break the script):
-```
-local exportRoot = "E:\My\Export\Folder"
-```
-
-4. Run the script in Aseprite via:  
+3. Run the script in Aseprite via:  
 `File > Scripts > export-by-group-recursive.lua`
 
 ---
@@ -101,7 +106,7 @@ local exportRoot = "E:\My\Export\Folder"
 ## 🔧 Requirements
 
 - Aseprite (v1.3 or newer recommended)
-- This version does **not** require `app.fs.fileDialog` (manual path)
+- No manual editing of the script required
 
 ---
 
@@ -110,7 +115,7 @@ local exportRoot = "E:\My\Export\Folder"
 This script is licensed under **Custom License inspired by BY-SA**.
 
 - ✅ Free to use, modify and share
-- ❌ Resale are **not** allowed
+- ❌ Resale is **not** allowed
 - 👤 Attribution required: [@feel.pixels](https://www.instagram.com/feel.pixels/) and ChatGPT
 
 ---
@@ -122,5 +127,5 @@ Crafted with 💛 by:
 - 🎨 [Feel](https://www.instagram.com/feel.pixels/) (concept, testing, structure)
 - 🤖 ChatGPT (Lua integration)
 
-Feel free to share improvements or fork it with attribution.
+Feel free to share improvements or fork it with attribution.  
 Keep crafting! 🚀
