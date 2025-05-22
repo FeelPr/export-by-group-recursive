@@ -10,10 +10,35 @@ local spr = app.activeSprite
 if not spr then return app.alert("No active sprite") end
 if spr.filename == "" then return app.alert("Please save your .aseprite file first") end
 
--- ✏️ Replace with your own export folder path
-local exportRoot = "C:/Path/To/Your/Export/Folder/"
-if exportRoot:find("C:/Path/To/Your/Export/Folder/") then
-  return app.alert("⚠️ Please set your own export path in the script line14 (variable 'local exportRoot =')")
+-- 🔍 Find all layers whose name starts with "%"
+local exportRoot = nil
+local percentLayers = {}
+
+for _, layer in ipairs(spr.layers) do
+  if layer.name:sub(1,1) == "%" then
+    table.insert(percentLayers, layer)
+  end
+end
+
+local exportMetaCount = #percentLayers
+
+if exportMetaCount == 0 then
+  return app.alert("No export path layer found. Create a layer named like = %D:/Your/Export/Path/")
+elseif exportMetaCount > 1 then
+  return app.alert("Multiple export path layers found. Only one layer starting with % (percent sign) is allowed = %D:/Your/Export/Path/")
+end
+
+exportRoot = percentLayers[1].name:sub(2)
+
+-- Validate export path format
+local lastChar = exportRoot:sub(-1)
+
+if lastChar ~= "/" and lastChar ~= "\\" then
+  return app.alert("Invalid export path: must end with slash or backslash = E:\\\\MyProject\\\\ -OR- E:/MyProject/")
+end
+
+if exportRoot:find("\\") and not exportRoot:find("\\\\") then
+  return app.alert("Windows paths must use double backslashes = E:\\\\MyProject\\\\ -OR- E:/MyProject/")
 end
 
 -- Ensure folder exists only once (cache to avoid multiple mkdir calls)
@@ -29,7 +54,7 @@ local function ensureDir(path, cache)
 end
 
 -- Setup log file
-local logPath = exportRoot .. "Export-Logs/"
+local logPath = exportRoot .. "= Export-Logs/"
 local createdPaths = {}
 ensureDir(logPath, createdPaths)
 local logFile = io.open(logPath .. "export-log.txt", "a")
@@ -150,7 +175,7 @@ end
 local function walk(container, parentGroup, ignored)
   for _, layer in ipairs(container.layers) do
     local name = layer.name or "(unnamed)"
-    local isIgnored = ignored or name:find("#")
+	local isIgnored = ignored or name:find("#") or name:sub(1,1) == "%"
     if isIgnored then
       logFile:write("→ Skipped (inherited or contains '#'): " .. name .. "\n")
       skippedCount = skippedCount + 1
