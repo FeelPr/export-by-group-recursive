@@ -68,6 +68,36 @@ Items/
 
 ---
 
+### 🔧 How to install
+
+1. Download the script from GitHub:  
+👉 <a href="https://github.com/FeelPr/export-by-group-recursive" target="_blank">GitHub – Export By Group (Recursive)</a>
+
+2. Place the `export-by-group-recursive.lua` file in your Aseprite scripts folder:
+C:\Users\YourName\AppData\Roaming\Aseprite\scripts\
+
+3. **Edit** the `exportRoot` (**line 14**) variable at the top of the script to set your preferred export folder path.
+> #### ⚠️ Important note about the export path
+> When editing the `exportRoot` variable, 
+> make sure to use **forward slashes `/`** or  **double backslashes `\\`** otherwise Lua will throw an error.
+
+✅ Correct example:
+```
+local exportRoot = "E:/My/Export/Folder/"
+-- or
+local exportRoot = "E:\\My\\Export\\Folder\\"
+```
+
+❌ Incorrect (this will break the script):
+```
+local exportRoot = "E:\My\Export\Folder"
+```
+
+4. Run the script in Aseprite via:  
+`File > Scripts > export-by-group-recursive.lua`
+
+---
+
 ## 🔧 Requirements
 
 - Aseprite (v1.3 or newer recommended)
