@@ -32,6 +32,8 @@ Name the group with `@`:
 
 → Will export as: `Tree_Maple.png`
 
+---
+
 ### 🔹 Skip a group or layer entirely
 
 Add a `#` in the name:
@@ -42,6 +44,8 @@ Add a `#` in the name:
 
 → Completely ignored (even if visible)
 
+---
+
 ### 🔹 Export visible layers individually
 
 Any visible layer not inside a `@group` or containing `#` will be exported trimmed:
@@ -50,6 +54,8 @@ Any visible layer not inside a `@group` or containing `#` will be exported trimm
 Layer: Sword_Blade → Sword_Blade.png
 ```
 
+---
+### 🔥NEW🔥
 ### 🔹 Define the export folder via a layer
 
 Instead of editing the script, you now define the export root path directly inside your `.aseprite` file.
