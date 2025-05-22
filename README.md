@@ -1,7 +1,7 @@
 
 # Export By Group (Recursive)
 
-A powerful and flexible Aseprite script to export your layers and groups intelligently. Designed by **Feel** ([https://www.instagram.com/feel.pixels/](https://www.instagram.com/feel.pixels/)) & ChatGPT, this script enables professional export workflows for artists working with layered sprites, dioramas, or modular elements.
+A powerful and flexible Aseprite script to export your layers and groups intelligently. Designed by **Feel** ([https://www.instagram.com/feel.pixels/](https://www.instagram.com/feel.pixels/)) & ChatGPT, this script enables professional export workflows for artists working with layered sprites or modular elements.
 
 ---
 
