@@ -1,3 +1,4 @@
+app.transaction(function()
 --[[
 Export By Group (Recursive) - final edition
 Author: Feel (https://www.instagram.com/feel.pixels/) & ChatGPT
@@ -106,31 +107,74 @@ end
 
 -- Merge a @group and export it as a single trimmed image
 local function exportGroupImage(group, groupName, folderPath)
-  logFile:write("\n→ Merging group: " .. group.name .. "\n")
-  local tempImage = Image(spr.width, spr.height, spr.colorMode)
-  local layersToDraw = {}
-  collectImageLayers(group, layersToDraw)
-  for _, layer in ipairs(layersToDraw) do
-    for _, cel in ipairs(layer.cels) do
-      tempImage:drawImage(cel.image, cel.position)
+  logFile:write("→ Merging group: " .. group.name .. "")
+  local originalGroupName = group.name
+
+  -- Recursively find the group index and its parent container
+  local function findLayerIndex(container, target)
+    for i, layer in ipairs(container.layers) do
+      if layer == target then return i, container end
+      if layer.isGroup then
+        local idx, parent = findLayerIndex(layer, target)
+        if idx then return idx, parent end
+      end
     end
   end
-  local bounds = getTrimBounds(tempImage)
-  if not bounds then
-    logFile:write("→ Skipped: group is fully transparent\n")
+
+  local groupIndex, parent = findLayerIndex(spr, group)
+  if not groupIndex or not parent then
+    logFile:write("→ Error: group index not found")
     skippedCount = skippedCount + 1
     return
   end
-  local trimmed = Image(bounds.w, bounds.h, spr.colorMode)
-  trimmed:drawImage(tempImage, Point(-bounds.x, -bounds.y))
-  local newSprite = Sprite(bounds.w, bounds.h)
-  newSprite.filename = groupName
-  newSprite:newCel(newSprite.layers[1], 1, trimmed, Point(0,0))
-  local filename = folderPath .. groupName .. ".png"
-  newSprite:saveCopyAs(filename)
-  newSprite:close()
-  logFile:write(string.format("→ Exported: %s (trimmed %dx%d)\n", filename, bounds.w, bounds.h))
-  exportCount = exportCount + 1
+
+  -- Flatten the group
+  app.range.layers = { group }
+  app.command.FlattenLayers()
+  logFile:write("→ Flattened successfully at group index " .. groupIndex .. " in " .. (parent.name or "ROOT") .. "\n")
+
+  -- After flattening, retrieve the new layer at the same index
+  local flattenedLayer = parent.layers[groupIndex]
+  if not flattenedLayer or not flattenedLayer.isImage then
+    logFile:write("→ Error: could not locate flattened image layer")
+    skippedCount = skippedCount + 1
+    return
+  end
+
+  -- Rename the flattened layer to match the original group name
+  flattenedLayer.name = originalGroupName
+
+  -- Process like a normal image layer export
+  for _, cel in ipairs(flattenedLayer.cels) do
+    local image = cel.image
+    local bounds = getTrimBounds(image)
+    if not bounds then
+      logFile:write("→ Skipped: group is fully transparent")
+      skippedCount = skippedCount + 1
+      return
+    end
+    ensureDir(folderPath, createdPaths)
+    local trimmed = Image(bounds.w, bounds.h, image.colorMode)
+    trimmed:drawImage(image, Point(-bounds.x, -bounds.y))
+    local newSprite = Sprite(bounds.w, bounds.h)
+    newSprite.filename = groupName
+    newSprite:newCel(newSprite.layers[1], cel.frameNumber, trimmed, Point(0, 0))
+	
+	local filename = folderPath .. groupName .. ".png"
+	logFile:write("→ Attempting to save: " .. filename .. "\n")
+
+    newSprite:saveCopyAs(filename)
+    newSprite:close()
+    logFile:write(string.format("→ Exported: %s (trimmed %dx%d)", filename, bounds.w, bounds.h))
+    exportCount = exportCount + 1
+	
+	logFile:write("→ Done processing group: " .. originalGroupName .. "\n")
+	
+	return
+  end
+
+  logFile:write("→ Skipped: no cels found")
+  skippedCount = skippedCount + 1
 end
 
 -- Export individual layer as trimmed PNG
@@ -182,18 +226,21 @@ local function walk(container, parentGroup, ignored)
     elseif not layer.isVisible then
       logFile:write("→ Skipped (not visible): " .. name .. "\n")
       skippedCount = skippedCount + 1
-    elseif isGroup(layer) then
-      if name:sub(1,1) == "@" then
-        local cleanName = name:sub(2)
-        local folderPath = exportRoot .. (parentGroup or "") .. "/"
-        ensureDir(folderPath, createdPaths)
-        exportGroupImage(layer, cleanName, folderPath)
-      else
-        logFile:write("→ Entering group: " .. name .. "\n")
-        walk(layer, parentGroup or name, false)
-      end
+	elseif isGroup(layer) then
+	
+	if name:sub(1,1) == "@" then
+	  local cleanName = name:sub(2)
+	  local folderPath = exportRoot .. (parentGroup and parentGroup .. "/" or "")
+	  ensureDir(folderPath, createdPaths)
+	  exportGroupImage(layer, cleanName, folderPath)
+	else
+	  logFile:write("→ Entering group: " .. name .. "\\n")
+	  local newGroupPath = (parentGroup and (parentGroup .. "/" .. name) or name)
+	  walk(layer, newGroupPath, ignored)
+	end
+
     elseif layer.isImage then
-      local folderPath = exportRoot .. (parentGroup or "") .. "/"
+      local folderPath = exportRoot .. (parentGroup and parentGroup .. "/" or "")
       exportLayer(layer, parentGroup, folderPath)
     else
       logFile:write("→ Skipped (unknown type): " .. name .. "\n")
@@ -210,3 +257,5 @@ logFile:write("------------\n\n")
 logFile:close()
 
 app.alert("Export complete: " .. exportCount .. " exported, " .. skippedCount .. " skipped.")
+end)
+app.undo()
